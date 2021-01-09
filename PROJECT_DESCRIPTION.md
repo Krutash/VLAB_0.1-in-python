@@ -7,6 +7,7 @@ After  a lot of investigation and analysis of system needs, we have used python 
 2. Kinetics of Iodination of Acetone.
 3. Calculation of Equilibrium Constant.
 4. Calculation of dissociation constant by conductometry.
+
 The same methodology can be extended for simulation of other experiments. For a demo video of how to navigate through the GUI, watch : 
 
 # A BIT ABOUT PYQT5
