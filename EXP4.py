@@ -6,6 +6,8 @@ import sys
 from PyQt5.QtMultimedia import QMediaContent, QMediaPlayer
 from PyQt5.QtMultimediaWidgets import QVideoWidget
 import math
+dataGEN=[0, 0, 0, 0, 0, 0, 0]
+
 class DragLabel(QLabel):
     def __init__(self, label, parent):
         super().__init__(label, parent)
@@ -50,9 +52,16 @@ class DropLabel(QLineEdit):
         super().__init__(label, parent)
         self.nameDropped = label
         self.setAcceptDrops(True)
+        self.value = 0.0
 
     def name_(self):
         return self.nameDropped
+    def value_(self):
+        return self.value
+    
+    def setValue(self, value):
+        self.value = value
+        
     def setName(self, name):
         self.nameDropped = name
  
@@ -64,68 +73,63 @@ class DropLabel(QLineEdit):
         pos = event.pos()
         text = event.mimeData().text()
         name = event.mimeData().html()
-        self.setText(text)
+        self.setValue(float(text))
         self.setName(name)
+        self.setText(name)
         event.acceptProposedAction()
         
-class Exp4_class(QWidget):
+class Exp4_class(QTabWidget):
 
     def __init__(self):
         super().__init__()
-        self.tabs4 = QTabWidget()
+        #self.tabs4 = QTabWidget()
         self.tab14 = QWidget()
         self.tab24 = QWidget()
         self.tab34 = QWidget()
         self.tab44 = QWidget()
-        self.tabs4.addTab(self.tab14,"Theory")
-        self.tabs4.addTab(self.tab24,"Perform")
-        self.tabs4.addTab(self.tab34, "Video")
-        self.tabs4.addTab(self.tab44, "Question Bank")
+        self.addTab(self.tab14," Theory ")
+        self.addTab(self.tab24," Perform ")
+        self.addTab(self.tab34, " Video ")
+        self.addTab(self.tab44, " Question Bank ")
+        self.setFont(QFont('Times', 12))
 
-        self.GiveLab = QLabel("Given Kcl Solution")
+        self.GiveLab = QLabel("KCl Solution :")
         self.spin_b = QDoubleSpinBox()
+        self.spin_b.setValue(0.3)
         self.spin_b.setStepType(QAbstractSpinBox.AdaptiveDecimalStepType)
         self.spin_b.valueChanged.connect(self.NoteValue)
-        self.AdjustLabel = QLabel("1. Adjust the Conductance\n and Calibrate")
-        self.labTemp = QLabel("")
+        self.AdjustLabel = QLabel("A). Adjust Conductance &\nCalibrate")
+        self.AdjustLabel.setFont(QFont('Times', 12))
         
-        self.formLay1 = QFormLayout()
-        self.formLay1.addRow(self.GiveLab, self.spin_b)
-        self.formLay1.addRow(self.AdjustLabel)
-        self.widgetCond = QWidget()
-        self.widgetCond.setLayout(self.formLay1)
-        
-        self.nextBut4 = QPushButton("Next")
-        self.nextBut4.clicked.connect(self.setNext4)
-        self.grpbox14 = QGroupBox()
-        self.grpbox1lay4 = QVBoxLayout()
-        self.grpbox1lay4.addWidget(self.widgetCond)
-        self.grpbox14.setLayout(self.grpbox1lay4)
 
         self.PipLabel = QLabel("")
         self.makLab = QLabel("")
         self.UseLab2 = QLabel("")
-        self.UseLab = QLabel("")
-        self.TheCon = QLabel("Concentration of stock:")
+        
+        self.TheCon = QLabel("B). STOCK (in N):")
+        self.TheCon.setFont(QFont('Times', 12))
         self.ConLine = QLineEdit()
-        self.ConLine.setMaximumWidth(50)
+        self.ConLine.setFont(QFont('Times', 12))
+        #self.ConLine.setMaximumWidth(50)
         self.nextBut24 = QPushButton("Generate Stock")
+        self.nextBut24.setFont(QFont('Times', 12))
         self.nextBut24.setEnabled(False)
         self.nextBut24.clicked.connect(self.validate)
         
         self.grpbo2lay4 = QFormLayout()
+        self.grpbo2lay4.addRow(self.GiveLab, self.spin_b)
+        self.grpbo2lay4.addRow(self.AdjustLabel)
         self.grpbo2lay4.addRow(self.PipLabel)
         self.grpbo2lay4.addRow(self.makLab)
         self.grpbo2lay4.addRow(self.UseLab2)
         self.grpbo2lay4.addRow(self.TheCon, self.ConLine)
-        self.grpbo2lay4.addRow(self.UseLab)
         self.grpbo2lay4.addRow(self.nextBut24)
 
-        self.grpbo24 = QGroupBox()
-        self.grpbo24.setLayout(self.grpbo2lay4)
-        self.maklab = QLabel("Make up the Volm to 100ml using Stock:")
-        self.rowTit_1 = QLabel("Conc")
-        self.rowTit_3 = QLabel("Stock")
+        
+        self.maklab = QLabel("\nC). Make up the Volm to\n100ml using Stock:")
+        self.maklab.setFont(QFont('Times', 12))
+        self.rowTit_1 = QLabel("-CONC-")
+        self.rowTit_3 = QLabel("-STOCK-")
 
         self.n4 = QLabel("N/4")
         self.n8 = QLabel("N/8")
@@ -141,7 +145,14 @@ class Exp4_class(QWidget):
         self.spin_n128n = QDoubleSpinBox()
         self.validateBut = QPushButton("Generate Solns")
         self.validateBut.setEnabled(False)
+        self.validateBut.setFont(QFont('Times', 12))
         self.validateBut.clicked.connect(self.validate2)
+
+        for i, j in zip([self.n4, self.n8, self.n16, self.n32, self.n64, self.n128],
+                        [self.spin_n4n, self.spin_n8n, self.spin_n16n, self.spin_n32n, self.spin_n64n, self.spin_n128n]):
+            i.setFont(QFont('Times', 12))
+            j.setFont(QFont('Times', 12))
+        
         
         self.grpbo3lay4 = QGridLayout()
         self.grpbo3lay4.addWidget(self.rowTit_1, 1, 0)
@@ -160,18 +171,18 @@ class Exp4_class(QWidget):
         self.grpbo3lay4.addWidget(self.spin_n64n, 6, 1)
         self.grpbo3lay4.addWidget(self.n128, 7, 0)
         self.grpbo3lay4.addWidget(self.spin_n128n, 7, 1)
-        
 
-        self.grpbo34 = QGroupBox()
         self.temp1 = QGroupBox()
         self.temp1.setLayout(self.grpbo3lay4)
+
+        self.grpbo2lay4.addRow(self.maklab)
+        self.grpbo2lay4.addRow(self.temp1)
+        self.grpbo2lay4.addRow(self.validateBut)
+        self.grpbo24 = QGroupBox()
+        self.grpbo24.setLayout(self.grpbo2lay4)
         
-        self.grms34 = QVBoxLayout()
-        self.grms34.addWidget(self.maklab)
-        self.grms34.addWidget(self.temp1)
-        self.grms34.addWidget(self.validateBut)
         
-        self.grpbo34.setLayout(self.grms34)
+        '''
         self.marklab = QLabel("Note Down Conductance below (in mS):")
 
         self.markn4 = QLabel("N/4")
@@ -212,22 +223,24 @@ class Exp4_class(QWidget):
 
         self.grpbo44 = QGroupBox()
         self.grpbo44.setLayout(self.grpbo4lay)
+        '''
         
         self.side1box4 = QGroupBox()
         self.side1lay4 = QVBoxLayout()
 
-        self.side1lay4.addWidget(self.grpbox14)
+        #self.side1lay4.addWidget(self.grpbox14)
         self.side1lay4.addWidget(self.grpbo24)
-        self.side1lay4.addWidget(self.grpbo34)
-        self.side1lay4.addWidget(self.grpbo44)
+        #self.side1lay4.addWidget(self.grpbo34)
+        #self.side1lay4.addWidget(self.grpbo44)
         
         self.side1box4.setLayout(self.side1lay4)
         self.Titlelab4 = QLabel("DISSOCIATION CONSTANT")
         self.Titlelab4.setAlignment(Qt.AlignCenter)
+        self.Titlelab4.setFont(QFont('Times', 12))
 
         self.SolutionsAvaliabel = QLabel("Avalable Solutions :")
 
-        self.StockSol = DragLabel("stock", self)
+        self.StockSol = DragLabel("Stock", self)
         self.StockSol.setPixmap(QPixmap("media/emptyflask.jpg"))
         self.StockSolLab = QLabel("Stock")
         self.StockSolLab.setAlignment(Qt.AlignCenter)
@@ -307,30 +320,19 @@ class Exp4_class(QWidget):
         
         self.meterLabel = DropLabel("Drop_here", self)
         self.meterLabel.setReadOnly(True)
-        self.meterLabel.setStyleSheet("QLineEdit {color: white; background-image : url(media/con_meter.jpg)}") 
+        self.meterLabel.setStyleSheet("QLineEdit {color: white; background-image : url(media/con_meter.jpg); background-repeat: no-repeat;background-position: 0% 0%;}") 
+        
         self.meterLabel.setMinimumWidth(500)
         self.meterLabel.setMaximumWidth(500)
         self.meterLabel.setMinimumHeight(470)
         self.meterLabel.textChanged.connect(self.update)
         self.meterLabel.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         
-        self.DialTemp = QDial()
-        self.DialTemp.setRange(1, 80)
-        self.DialTemp.setValue(25)
-        self.DialTemp.setNotchesVisible(True)
-        self.DialTemp.valueChanged.connect(self.changedTemp)
         
-        self.tempLCD = QLCDNumber()
-        self.tempLCD.setStyleSheet("QLCDNumber { background-color: blue }")
-        self.tempLCD.display(25)
-
-        self.tempLab = QLabel("TEMPERATURE")
-        self.tempLab.setAlignment(Qt.AlignCenter)
-        self.conLab = QLabel("CONDUCTANCE")
+        self.conLab = QLabel("CONDUCTANCE -(mS)-")
         self.conLab.setAlignment(Qt.AlignCenter)
         
         self.conLCD = QLCDNumber()
-        self.conLCD.setStyleSheet("QLCDNumber { background-color: blue }")
 
         self.conLCD.setSmallDecimalPoint(True)
         self.conLCD.setDigitCount(5)
@@ -340,49 +342,73 @@ class Exp4_class(QWidget):
         self.DialCon.setNotchesVisible(False)
         self.DialCon.valueChanged.connect(self.changedValue)
 
-        self.calBut = QPushButton("Calibrate")
+        self.ResetBut = QPushButton("RESET")
+        self.ResetBut.clicked.connect(self.RESET)
+        self.calBut = QPushButton("CALIBRATE")
         self.calButlab = QLabel("Calibrate")
+        self.Display = QLineEdit()
+        self.Display.setAlignment(Qt.AlignCenter)
+        self.resLay = QVBoxLayout()
+        self.resLay.addWidget(self.calBut)
+        self.resLay.addWidget(self.Display)
+        self.resLay.addWidget(self.ResetBut)
+
+        for i in [self.ResetBut, self.calBut, self.Display]:
+            i.setFont(QFont('Times', 12))
+        
+        self.resLayW = QWidget()
+        self.resLayW.setLayout(self.resLay)
+        self.resLayW.setMaximumWidth(120)
+        
         self.calBut.clicked.connect(self.setNext4)
         
-        self.ResetBut = QPushButton("RESET")
-        self.calBut.resize(10, 10)
-        self.ResetBut.resize(10, 10)
-        self.ResetButlab = QLabel("RESET")
-        self.Unit = QLabel("Units")
-        self.UnitLCD = QLCDNumber()
-        self.UnitLCD.setStyleSheet("QLCDNumber { background-color: blue }")
-        self.UnitLCD.display("E-3 S")
+        self.conDisLay = QVBoxLayout()
+        self.conDisLay.addWidget(self.DialCon)
+        self.conDisLay.addWidget(self.conLab)
+        self.conDisLayww = QWidget()
+        self.conDisLayww.setLayout(self.conDisLay)
 
-        self.SideButBox = QGroupBox()
-        self.SideButBoxlay = QFormLayout()
-        self.SideButBoxlay.addRow(self.calBut)
-        self.SideButBoxlay.addRow(self.ResetBut)
-        self.SideButBoxlay.addRow(self.Unit, self.UnitLCD)
-        
-        self.SideButBox.setLayout(self.SideButBoxlay)
-        
+        self.conDisLayW = QHBoxLayout()
+        self.conDisLayW.addWidget(self.conLCD)
+        #self.conDisLayW.addWidget(self.conDisLayww)
+        self.conDisLayWww = QGroupBox()
+        self.conDisLayWww.setLayout(self.conDisLayW)
 
-        self.GroupBOX = QGroupBox()
-        self.GroupTEMP = QGroupBox()
-        self.GroupTEMPLay = QVBoxLayout()
-        self.GroupTEMPLay.addWidget(self.DialTemp)
-        self.GroupTEMPLay.addWidget(self.tempLab)
-        self.GroupTEMPLay.addWidget(self.tempLCD)
-        self.GroupTEMP.setLayout(self.GroupTEMPLay)
-        self.GroupTEMP.setAlignment(Qt.AlignCenter)
+        self.DialTemp = QDial()
+        self.DialTemp.setRange(1, 80)
+        self.DialTemp.setValue(25)
+        #self.DialTemp.setNotchesVisible(True)
+        self.DialTemp.valueChanged.connect(self.changedTemp)
         
-        self.GroupCON = QGroupBox()
-        self.GroupCONLay = QVBoxLayout()
-        self.GroupCONLay.addWidget(self.DialCon)
-        self.GroupCONLay.addWidget(self.conLab)
-        self.GroupCONLay.addWidget(self.conLCD)
-        self.GroupCON.setLayout(self.GroupCONLay)
+        self.tempLCD = QLCDNumber()
+        self.tempLCD.display(25)
+
+        self.tempLab = QLabel("TEMPERATURE")
+        self.tempLab.setAlignment(Qt.AlignCenter)
+
+        self.tempLayD = QVBoxLayout()
+        self.tempLayD.addWidget(self.DialTemp)
+        self.tempLayD.addWidget(self.tempLab)
+        
+        self.tempLayDW = QWidget()
+        self.tempLayDW.setLayout(self.tempLayD)
+        
+        self.tempLay = QHBoxLayout()
+        self.tempLay.addWidget(self.tempLCD)
+        self.tempLay.addWidget(self.tempLayDW)
+        self.tempLayW = QGroupBox()
+        self.tempLayW.setLayout(self.tempLay)
+        
 
         self.GROUPDOWNlay = QHBoxLayout()
-        self.GROUPDOWNlay.addWidget(self.GroupTEMP)
-        self.GROUPDOWNlay.addWidget(self.GroupCON)
-        self.GROUPDOWNlay.addWidget(self.SideButBox)
+        #self.GROUPDOWNlay.addWidget(self.GroupTEMP)
+        self.GROUPDOWNlay.addWidget(self.conDisLayWww)
+        self.GROUPDOWNlay.addWidget(self.conDisLayww)
+        self.GROUPDOWNlay.addWidget(self.resLayW)
+        self.GROUPDOWNlay.addWidget(self.tempLayW)
+        self.GroupBOX = QGroupBox()
         self.GroupBOX.setLayout(self.GROUPDOWNlay)
+        self.GroupBOX.setMaximumHeight(200)
 
         self.side2lay4 = QVBoxLayout()
         self.side2lay4.addWidget(self.Titlelab4)
@@ -398,6 +424,267 @@ class Exp4_class(QWidget):
         self.Page4lay.addWidget(self.side2wid4)
 
         self.tab24.setLayout(self.Page4lay)
+        
+        self.otherPages()
+        
+        self.errorAccu = 0
+        self.errorFlag = 0
+        self.flag = 0
+        self.Ka = 0
+        self.Display.setText("NONE")
+    def update(self):
+        if(self.meterLabel.text() == "COND"):
+            return
+        try :
+            val = float(self.meterLabel.value_())
+            
+        except:
+            val = 0
+        self.Display.setText(str(self.meterLabel.name_()))
+        self.conLCD.display(val)
+        self.DialCon.setValue(val*100)
+        self.meterLabel.setText("COND")
+        
+        
+    def setNext4(self):
+        name = self.meterLabel.name_()
+        if(name != "KCl"):
+            self.errorFlag = 1
+            self.errorMessage()
+            return
+        val = float(self.DialCon.value())/100
+        if(val != 12.88):
+            self.errorAccu = ((val-12.88)/12.88)
+            if(self.errorAccu > 0.3 or self.errorAccu < -0.3):
+                self.errorFlag = 3
+                self.errorMessage()
+                return
+        if(val !=  self.KCLSol.value_()):
+            self.flag = 0
+        self.KCLSol.setValue(val)
+        self.PipLabel.setText("1.Pipette out 50 ml 1N Acetic Acid")
+        self.makLab.setText("2.Make up the volm to 100 ml")
+        self.UseLab2.setText("(Use Conductivity Water !!)")
+        
+        self.nextBut24.setEnabled(True)
+
+    def play4(self):
+        
+        fileName = "media/exp4.mp4"
+        if self.loaded4 == 0:
+            self.mediaPlayer4.setMedia(QMediaContent(QUrl.fromLocalFile(fileName)))
+            self.playButton4.setEnabled(True)
+            self.playButton4.setText("Pause")
+            self.loaded4 = 1
+            
+        if self.mediaPlayer4.state() == QMediaPlayer.PlayingState:
+            self.mediaPlayer4.pause()
+            self.playButton4.setText("Play")
+        else:
+            self.mediaPlayer4.play()
+            self.playButton4.setText("Pause")
+ 
+    def mediaStateChanged4(self, state):
+        if self.mediaPlayer4.state() == QMediaPlayer.PlayingState:
+            self.playButton4.setIcon(self.style().standardIcon(QStyle.SP_MediaPause))
+        else:
+            self.playButton4.setIcon(self.style().standardIcon(QStyle.SP_MediaPlay))
+ 
+    def positionChanged4(self, position):
+        self.positionSlider4.setValue(position)
+ 
+    def durationChanged4(self, duration):
+        self.positionSlider4.setRange(0, duration)
+ 
+    def setPosition4(self, position):
+        self.mediaPlayer4.setPosition(position)
+ 
+    def handleError4(self):
+        self.playButton4.setEnabled(False)
+        self.errorLabel4.setText("Error: " + self.mediaPlayer4.errorString())
+
+    def NoteValue(self):
+
+        condval = self.spin_b.value()
+
+    def changedValue(self):
+        val = float(self.DialCon.value())/100
+        self.conLCD.display(val)
+
+    def changedTemp(self):
+        self.tempLCD.display(self.DialTemp.value())
+    def validate(self):
+
+        try:
+            k = float(self.ConLine.text())
+            if(k <= 0):
+                self.errorFlag = 2
+                self.errorMessage()
+                return
+
+            self.StockSol.setPixmap(QPixmap("media/smallflask.jpg"))
+            Ka = 1.75
+            k = float(random.randint(100, 9999))
+            error = k/10000
+            Ka = Ka + error
+            Ka = Ka/100000
+            
+            c1 = (float(self.ConLine.text())*100)/(100)
+            
+            alpha1 = (math.sqrt((Ka**2) + (4*c1*Ka))-Ka)/(2*c1)
+            kappa1 = "%.3f" %(390.8*alpha1)
+            
+            self.StockSol.setValue(kappa1)
+            self.validateBut.setEnabled(True)
+
+            self.errorFlag = 6
+            self.errorMessage()
+        except:
+            self.errorFlag = 2
+            self.validateBut.setEnabled(False)
+            self.errorMessage()
+    def validate2(self):
+        if(True):
+            try:
+                k = float(self.ConLine.text())
+                if(k <= 0):
+                    self.errorFlag = 2
+                    self.errorMessage()
+            except:
+                self.errorFlag = 2
+                self.errorMessage()
+                return
+            
+        for i in[ self.spin_n4n, self.spin_n8n, self.spin_n16n, self.spin_n32n, self.spin_n64n, self.spin_n128n]:
+            try:
+                temp = float(i.value())
+                
+                if temp >= 100 or temp == 0:
+                    self.errorFlag = 4
+                    self.errorMessage()
+                    return
+            except:
+                self.errorMessage()
+                return
+        self.CalculateConductivity()
+
+    def CalculateConductivity(self):
+
+        Ka = 1.75
+        k = float(random.randint(100, 9999))
+        error = k/10000
+        Ka = Ka + error
+        Ka = Ka/100000
+        
+        if(self.flag == 0) :
+            self.Ka = Ka
+            c1 = (float(self.ConLine.text())*self.spin_n4n.value())/(100)
+            c2 = (float(self.ConLine.text())*self.spin_n8n.value())/(100)
+            c3 = (float(self.ConLine.text())*self.spin_n16n.value())/(100)
+            c4 = (float(self.ConLine.text())*self.spin_n32n.value())/(100)
+            c5 = (float(self.ConLine.text())*self.spin_n64n.value())/(100)
+            c6 = (float(self.ConLine.text())*self.spin_n128n.value())/(100)
+            #print("values extracted")
+            c1 = c1 + (((float(random.randint(-200, 200)))/10000)*c1)+ self.errorAccu*c1
+            c2 = c2 + (((float(random.randint(-200, 200)))/10000)*c2)+ self.errorAccu*c2
+            c3 = c3 + (((float(random.randint(-200, 200)))/10000)*c3)+ self.errorAccu*c3
+            c4 = c4 + (((float(random.randint(-200, 200)))/10000)*c4)+ self.errorAccu*c4
+            c5 = c5 + (((float(random.randint(-200, 200)))/10000)*c5)+ self.errorAccu*c5
+            c6 = c6 + (((float(random.randint(-200, 200)))/10000)*c6)+ self.errorAccu*c6
+            #print("error added")
+            alpha1 = (math.sqrt((Ka**2) + (4*c1*Ka))-Ka)/(2*c1)
+            alpha2 = (math.sqrt((Ka**2) + (4*c2*Ka))-Ka)/(2*c2)
+            alpha3 = (math.sqrt((Ka**2) + (4*c3*Ka))-Ka)/(2*c3)
+            alpha4 = (math.sqrt((Ka**2) + (4*c4*Ka))-Ka)/(2*c4)
+            alpha5 = (math.sqrt((Ka**2) + (4*c5*Ka))-Ka)/(2*c5)
+            alpha6 = (math.sqrt((Ka**2) + (4*c6*Ka))-Ka)/(2*c6)
+            #print("alpha calculated")
+            kappa1 = "%.3f" %(390.8*alpha1)
+            kappa2 = "%.3f" %(390.8*alpha2)
+            kappa3 = "%.3f" %(390.8*alpha3)
+            kappa4 = "%.3f" %(390.8*alpha4)
+            kappa5 = "%.3f" %(390.8*alpha5)
+            kappa6 = "%.3f" %(390.8*alpha6)
+            #print("kappa calculated")
+            self.flag = 1
+            self.N4Sol.setValue(kappa1)
+            self.N8Sol.setValue(kappa2)
+            self.N16Sol.setValue(kappa3)
+            self.N32Sol.setValue(kappa4)
+            self.N64Sol.setValue(kappa5)
+            self.N128Sol.setValue(kappa6)
+            global dataGEN
+            dataGEN = [self.ConLine.text()]
+            for i in [kappa1, kappa2, kappa3, kappa4, kappa5, kappa6]:
+                dataGEN.append(str(i))
+            #print("Done calculated")
+        if(self.flag == 1):
+            self.N4Sol.setPixmap(QPixmap("media/smallflask.jpg"))
+            self.N8Sol.setPixmap(QPixmap("media/smallflask.jpg"))
+            self.N16Sol.setPixmap(QPixmap("media/smallflask.jpg"))
+            self.N32Sol.setPixmap(QPixmap("media/smallflask.jpg"))
+            self.N64Sol.setPixmap(QPixmap("media/smallflask.jpg"))
+            self.N128Sol.setPixmap(QPixmap("media/smallflask.jpg"))
+
+            self.errorFlag = 7
+            self.errorMessage()
+            
+    def RESET(self) :
+        for i in [self.N4Sol, self.N8Sol, self.N16Sol, self.N32Sol, self.N64Sol, self.N128Sol]:
+            i.setPixmap(QPixmap("media/emptyflask.jpg"))
+            i.setValue(0)
+        for i in[ self.spin_n4n, self.spin_n8n, self.spin_n16n, self.spin_n32n, self.spin_n64n, self.spin_n128n]:
+            i.setValue(0)
+        self.flag = 0
+        self.meterLabel.setText("COND")
+        self.meterLabel.setValue(0)
+        self.meterLabel.setName("COND")
+        self.Display.setText("NONE")
+        self.validateBut.setEnabled(False)
+        self.nextBut24.setEnabled(False)
+        
+    def errorMessage(self):
+        self.w = QMessageBox()
+        self.w.resize(150, 150)
+        textM = "Unknown Error"
+        text = "Error could not be identified. Report a Bug?"
+        title = "UNKNOWN ERROR !"
+        if(self.errorFlag == 1):
+            text = "Calibration Data Available for KCl Only."
+            title = "CALIBRATION!"
+            textM = "Calibration Error!"
+        elif(self.errorFlag == 2):
+            text = "Invalid Entry ! Please Enter a valid concentration for Stock Solution."
+            textM = "Stock Error!"
+            title = "STOCK !"
+        elif(self.errorFlag == 3):
+            title = "CALIBRATION!"
+            textM = "Calibration Error!"
+            text = "Inaccurate Calibration for KCl.\nRecalibration Recommended.\n(Tip : Use Keyboard arrow keys)"
+        elif(self.errorFlag == 4):
+            textM = "Solution Concentration Error!"
+            title = "SOLUTIONS"
+            text = "Inaccurate Solution preparation. Reverification Recommended."
+        elif(self.errorFlag == 6):
+            title = "STOCK CREATED"
+            text = "Stock Solution Now prepared"
+            textM = "ATTENTION !"
+        elif(self.errorFlag == 7):
+            title = "SOLUTIONS CREATED"
+            text = "All Solution Now prepared"
+            textM = "ATTENTION !"
+            
+        if(self.errorFlag >= 6):
+            self.w.setIcon(QMessageBox.Information)
+        else :
+            self.w.setIcon(QMessageBox.Critical)
+        self.w.setText(textM)
+        self.w.setInformativeText(text)
+        self.w.setWindowTitle(title)
+        self.w.exec()
+        self.errorFlag = 0
+        
+    def otherPages(self):
         self.mediaPlayer4 = QMediaPlayer(None, QMediaPlayer.VideoSurface)
         self.playButton4 = QPushButton("Play")
         self.playButton4.setEnabled(True)
@@ -474,214 +761,10 @@ class Exp4_class(QWidget):
         self.tab3Lay4 = QVBoxLayout()
         self.tab3Lay4.addWidget(self.Video_widget4)
         self.tab34.setLayout(self.tab3Lay4)
-
-        self.HomePage_lay4 = QHBoxLayout()
-        self.HomePage_lay4.addWidget(self.tabs4)       
-        self.Exp4_widget = QWidget()
-        self.setLayout(self.HomePage_lay4)
-        self.setWindowTitle("ChemVlab-1.0.0")
-        self.errorAccu = 0
-        self.errorFlag = 0
-        self.flag = 0
-        self.Ka = 0
-        
-    def update(self):
-        try :
-            val = float(self.meterLabel.text())
-        except:
-            val = 0
-        self.conLCD.display(val)
-        self.DialCon.setValue(val*100)
-        
-        
-    def setNext4(self):
-        name = self.meterLabel.name_()
-        if(name != "KCl"):
-            self.errorFlag = 1
-            self.errorMessage()
-            return
-        val = float(self.DialCon.value())/100
-        if(val != 12.88):
-            self.errorAccu = ((val-12.88)/12.88)
-            if(self.errorAccu > 0.3 or self.errorAccu < -0.3):
-                self.errorFlag = 3
-                self.errorMessage()
-                return
-        if(val !=  self.KCLSol.value_()):
-            self.flag = 0
-        self.KCLSol.setValue(val)
-        self.PipLabel.setText("2.Pipette out 50 ml 1N Acetic Acid")
-        self.makLab.setText("3.Make up the volm to 100 ml")
-        self.UseLab2.setText("(Use Conductivity Water !!)")
-        self.TheCon.setText("Concentration of stock:")
-        self.nextBut24.setEnabled(True)
-
-    def play4(self):
-        
-        fileName = "media/exp4.mp4"
-        if self.loaded4 == 0:
-            self.mediaPlayer4.setMedia(QMediaContent(QUrl.fromLocalFile(fileName)))
-            self.playButton4.setEnabled(True)
-            self.playButton4.setText("Pause")
-            self.loaded4 = 1
-            
-        if self.mediaPlayer4.state() == QMediaPlayer.PlayingState:
-            self.mediaPlayer4.pause()
-            self.playButton4.setText("Play")
-        else:
-            self.mediaPlayer4.play()
-            self.playButton4.setText("Pause")
- 
-    def mediaStateChanged4(self, state):
-        if self.mediaPlayer4.state() == QMediaPlayer.PlayingState:
-            self.playButton4.setIcon(self.style().standardIcon(QStyle.SP_MediaPause))
-        else:
-            self.playButton4.setIcon(self.style().standardIcon(QStyle.SP_MediaPlay))
- 
-    def positionChanged4(self, position):
-        self.positionSlider4.setValue(position)
- 
-    def durationChanged4(self, duration):
-        self.positionSlider4.setRange(0, duration)
- 
-    def setPosition4(self, position):
-        self.mediaPlayer4.setPosition(position)
- 
-    def handleError4(self):
-        self.playButton4.setEnabled(False)
-        self.errorLabel4.setText("Error: " + self.mediaPlayer4.errorString())
-
-    def NoteValue(self):
-
-        condval = self.spin_b.value()
-
-    def changedValue(self):
-        val = float(self.DialCon.value())/100
-        self.conLCD.display(val)
-
-    def changedTemp(self):
-        self.tempLCD.display(self.DialTemp.value())
-    def validate(self):
-
-        try:
-            k = float(self.ConLine.text())
-            if(k<0.45 or k>0.55):
-               self.UseLab.setText("Wrong ! it's 0.5. Anyways continue")
-            else :
-                self.UseLab.setText("Correct ! it's 0.5.")
-
-            self.StockSol.setPixmap(QPixmap("media/smallflask.jpg"))
-            Ka = 1.75
-            k = float(random.randint(100, 9999))
-            error = k/10000
-            Ka = Ka + error
-            Ka = Ka/100000
-            
-            c1 = (float(self.ConLine.text())*100)/(100)
-            c1 = c1 + (((float(random.randint(-200, 200)))/10000)*c1)
-            alpha1 = (math.sqrt((Ka**2) + (4*c1*Ka))-Ka)/(2*c1)
-            kappa1 = "%.3f" %(390.8*alpha1)
-            
-            self.StockSol.setValue(kappa1)
-            self.validateBut.setEnabled(True)
-        except:
-            self.errorFlag = 2
-            self.validateBut.setEnabled(False)
-            self.errorMessage()
-    def validate2(self):
-        for i in[self.spin_n4n, self.spin_n8n, self.spin_n16n, self.spin_n32n, self.spin_n64n, self.spin_n128n]:
-            try:
-                temp = float(i.value())
-                
-                if temp >= 100 or temp == 0:
-                    self.errorFlag = 4
-                    self.errorMessage()
-                    return
-            except:
-                self.errorMessage()
-                return
-        self.CalculateConductivity()
-
-    def CalculateConductivity(self):
-
-        Ka = 1.75
-        k = float(random.randint(100, 9999))
-        error = k/10000
-        Ka = Ka + error
-        Ka = Ka/100000
-        
-        if(self.flag == 0) :
-            self.Ka = Ka
-            c1 = (float(self.ConLine.text())*self.spin_n4n.value())/(100)
-            c2 = (float(self.ConLine.text())*self.spin_n8n.value())/(100)
-            c3 = (float(self.ConLine.text())*self.spin_n16n.value())/(100)
-            c4 = (float(self.ConLine.text())*self.spin_n32n.value())/(100)
-            c5 = (float(self.ConLine.text())*self.spin_n64n.value())/(100)
-            c6 = (float(self.ConLine.text())*self.spin_n128n.value())/(100)
-            #print("values extracted")
-            c1 = c1 + (((float(random.randint(-200, 200)))/10000)*c1)+ self.errorAccu*c1
-            c2 = c2 + (((float(random.randint(-200, 200)))/10000)*c2)+ self.errorAccu*c2
-            c3 = c3 + (((float(random.randint(-200, 200)))/10000)*c3)+ self.errorAccu*c3
-            c4 = c4 + (((float(random.randint(-200, 200)))/10000)*c4)+ self.errorAccu*c4
-            c5 = c5 + (((float(random.randint(-200, 200)))/10000)*c5)+ self.errorAccu*c5
-            c6 = c6 + (((float(random.randint(-200, 200)))/10000)*c6)+ self.errorAccu*c6
-            #print("error added")
-            alpha1 = (math.sqrt((Ka**2) + (4*c1*Ka))-Ka)/(2*c1)
-            alpha2 = (math.sqrt((Ka**2) + (4*c2*Ka))-Ka)/(2*c2)
-            alpha3 = (math.sqrt((Ka**2) + (4*c3*Ka))-Ka)/(2*c3)
-            alpha4 = (math.sqrt((Ka**2) + (4*c4*Ka))-Ka)/(2*c4)
-            alpha5 = (math.sqrt((Ka**2) + (4*c5*Ka))-Ka)/(2*c5)
-            alpha6 = (math.sqrt((Ka**2) + (4*c6*Ka))-Ka)/(2*c6)
-            #print("alpha calculated")
-            kappa1 = "%.3f" %(390.8*alpha1)
-            kappa2 = "%.3f" %(390.8*alpha2)
-            kappa3 = "%.3f" %(390.8*alpha3)
-            kappa4 = "%.3f" %(390.8*alpha4)
-            kappa5 = "%.3f" %(390.8*alpha5)
-            kappa6 = "%.3f" %(390.8*alpha6)
-            #print("kappa calculated")
-            self.flag = 1
-            self.N4Sol.setValue(kappa1)
-            self.N8Sol.setValue(kappa2)
-            self.N16Sol.setValue(kappa3)
-            self.N32Sol.setValue(kappa4)
-            self.N64Sol.setValue(kappa5)
-            self.N128Sol.setValue(kappa6)
-            #print("Done calculated")
-        if(self.flag == 1):
-            self.N4Sol.setPixmap(QPixmap("media/smallflask.jpg"))
-            self.N8Sol.setPixmap(QPixmap("media/smallflask.jpg"))
-            self.N16Sol.setPixmap(QPixmap("media/smallflask.jpg"))
-            self.N32Sol.setPixmap(QPixmap("media/smallflask.jpg"))
-            self.N64Sol.setPixmap(QPixmap("media/smallflask.jpg"))
-            self.N128Sol.setPixmap(QPixmap("media/smallflask.jpg"))
-            
-    def errorMessage(self):
-        self.w = QMessageBox()
-        self.w.resize(150, 150)
-        title = "Warning"
-        text = "Invalid entry !\nPlease Check Entered Values."
-        if(self.errorFlag == 1):
-            text = "Calibration Error!\nCalibration Data Available for KCl Only."
-            title = "Error!"
-        elif(self.errorFlag == 2):
-            text = "Invalid Entry !\nPlease Enter a valid concentration for Stock Solution."
-        elif(self.errorFlag == 3):
-            text = "Warning!\nInaccurate Calibration for KCl.\nRecalibration Recommended.\n(Tip : Use Keyboard arrow keys)"
-        elif(self.errorFlag == 4):
-            text = "Warning!\nInaccurate Solution preparation.\nReverification Recommended."
-        self.w.setIcon(QMessageBox.Warning)
-        self.w.setInformativeText(text)
-        self.w.setWindowTitle(title)
-        self.w.exec()
-        self.errorFlag = 0
-        
+def getUnknowns():
+    global dataGEN
+    return dataGEN        
 def main_exp4():
     obj = Exp4_class()
     return obj
 
-Vlab = QApplication(sys.argv)
-obj = main_exp4()
-#obj.show()
-obj.showMaximized()
-Vlab.exec_()
