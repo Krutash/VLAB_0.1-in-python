@@ -1,5 +1,5 @@
 ******************************
-Will Update and upload all the scripts soon.
+# VLAB-0.1
 ******************************
 # ABOUT
 During the time of Covid-19, the world went into a lockdown, with universities shut, it was difficult for everyone. It’s been more than 6 months that universities have been shut, making it very challenging for students and teachers to progress in courses requiring practical hand skills. For a newly admitted undergraduate student it’s very important to explore various domains of his field. That includes practical courses such as chemistry laboratory as well. Any Laboratory course is exciting as we get to apply what we have learned through various experiments. Our project of creating Virtual laboratory is an attempt to provide a platform where we can simulate laboratory hands-on experience virtually. Our aim is to create and provide an environment to extend, improve, integrate, refine, and assist the experimentation process in chemistry laboratory.
