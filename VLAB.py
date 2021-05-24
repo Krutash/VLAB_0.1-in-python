@@ -242,5 +242,5 @@ if __name__ == "__main__":
     MainWindow.show()
     app.exec_()
     if(x == 1):
-        import testVlab
-        testVlab.main(app, user_dets, k, sheets)
+        import DashBoard
+        DashBoard.main(app, user_dets, k, sheets)
