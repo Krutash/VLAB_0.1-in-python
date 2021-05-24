@@ -1,345 +1,246 @@
-import PyQt5
-import PyQt5.QtCore
-from PyQt5.QtCore import *
-import PyQt5.QtGui
-from PyQt5.QtGui import *
-import PyQt5.QtWidgets
-from PyQt5.QtWidgets import *
-import random
+from PyQt5 import QtCore, QtGui, QtWidgets
 import sys
-import threading
-class VlabWindow(QMainWindow):
+from PyQt5.QtWidgets import (QApplication, QWidget, QPushButton, QLabel, QLineEdit, QGridLayout, QMessageBox,QDialog)
+import os
+import qdarkstyle
+import sheets
+import smtplib
+
+x = 0
+user_dets = []
+k = 0
+print("ALL MODULES IMPORTED")
+class Ui_MainWindow(object):
+    def setupUi(self, MainWindow):
+        MainWindow.setObjectName("MainWindow")
+        MainWindow.setEnabled(True)
+        MainWindow.resize(821, 555)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(MainWindow.sizePolicy().hasHeightForWidth())
+        MainWindow.setSizePolicy(sizePolicy)
+        MainWindow.setAutoFillBackground(False)
+        MainWindow.setStyleSheet("background-image: url(:/newPrefix/login-form-design-02.jpg);\n"
+"color:white;\n"
+"")
+        self.centralwidget = QtWidgets.QWidget(MainWindow)
+        self.centralwidget.setObjectName("centralwidget")
+        self.label = QtWidgets.QLabel(self.centralwidget)
+        self.label.setGeometry(QtCore.QRect(270, 120, 310, 41))
+        MainWindow.setWindowFlags(QtCore.Qt.WindowCloseButtonHint | QtCore.Qt.WindowMinimizeButtonHint)
+        font = QtGui.QFont()
+        font.setPointSize(17)
+        self.label.setFont(font)
+        #self.label.setStyleSheet("color:white;")
+        self.label.setObjectName("label")
+        self.label_2 = QtWidgets.QLabel(self.centralwidget)
+        self.label_2.setGeometry(QtCore.QRect(270, 150, 251, 41))
+        font = QtGui.QFont()
+        font.setPointSize(7)
+        self.label_2.setFont(font)
+        self.label_2.setObjectName("label_2")
+        self.textEdit = QLineEdit(self.centralwidget)
+        self.textEdit.setGeometry(QtCore.QRect(331, 366, 191, 28))
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        self.textEdit.setFont(font)
+        self.textEdit.setStyleSheet("text-align: center;\n")
+        self.textEdit.setObjectName("textEdit")
+        self.textEdit_2 = QLineEdit(self.centralwidget)
+        self.textEdit_2.setGeometry(QtCore.QRect(330, 400, 191, 27))
+        #self.successLab = QtWidgets.QLabel(self.centralwidget)
+        #self.successLab.setGeometry(QtCore.QRect(329, 434, 191, 26))
+        font = QtGui.QFont('Times', 12)
+        font.setPointSize(12)
+        self.textEdit_2.setFont(font)
+        #self.textEdit_2.setStyleSheet(" border-radius: 10px;\n"
+#"color:white;\n"
+#"\n"
+#"")
+        #self.textEdit_2.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        #self.textEdit_2.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.textEdit_2.setFrame(True)
+        self.textEdit_2.setFrame(True)
+        self.textEdit_2.setObjectName("textEdit_2")
+        self.textEdit_2.editingFinished.connect(self.check_password)
+        self.textEdit_2.returnPressed.connect(self.check_password)
+        self.label_3 = QtWidgets.QLabel(self.centralwidget)
+        self.label_3.setGeometry(QtCore.QRect(278, 279, 59, 17))
+        self.label_3.setText("")
+        self.label_3.setObjectName("label_3")
+        self.pushButton = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton.setGeometry(QtCore.QRect(295, 462, 89, 25))
+        self.pushButton.setObjectName("pushButton")
+        self.pushButton_2 = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton_2.setGeometry(QtCore.QRect(403, 461, 169, 25))
+        #self.pushButton_2.setStyleSheet("background-color: rgb(238, 238, 236);")
+        self.pushButton_2.setObjectName("pushButton_2")
+        self.pushButton.clicked.connect(self.check_password)
+        self.pushButton_2.clicked.connect(self.ForgotpasswordForm)
+        MainWindow.setCentralWidget(self.centralwidget)
+        self.menubar = QtWidgets.QMenuBar(MainWindow)
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 821, 22))
+        self.menubar.setObjectName("menubar")
+        MainWindow.setMenuBar(self.menubar)
+        self.statusbar = QtWidgets.QStatusBar(MainWindow)
+        self.statusbar.setObjectName("statusbar")
+        MainWindow.setStatusBar(self.statusbar)
+
+        self.retranslateUi(MainWindow)
+        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+
+
+    def retranslateUi(self, MainWindow):
+        _translate = QtCore.QCoreApplication.translate
+        MainWindow.setWindowTitle(_translate("MainWindow", "Welcome to VLAB"))
+        self.label.setText(_translate("MainWindow", "VIRTUAL LABORATORY"))
+        self.label_2.setText(_translate("MainWindow", "Virtual Chemistry Lab."))
+        MainWindow.setWindowIcon(QtGui.QIcon('media/icon.ico'))
+        self.textEdit.setPlaceholderText(_translate("MainWindow", "Username"))
+        self.textEdit_2.setPlaceholderText(_translate("MainWindow", "Password"))
+        self.pushButton.setText(_translate("MainWindow", "Login"))
+        self.pushButton_2.setText(_translate("MainWindow", "Forgot password..?"))
+       
+
+    def check_password(self):
+        msg = QMessageBox()
+        log_name = self.textEdit.text().strip()
+        log_pass = self.textEdit_2.text().strip()
+        if(log_name == '' or log_pass == ''):
+            return
+        global k
+        global user_dets
+        login_status, user_dets, k = sheets.loginverify(log_name, log_pass)
+
+        if login_status:
+            if(user_dets == None):
+                msg = QMessageBox()
+                msg.setWindowTitle("ERROR")
+                msg.setText("Invalid User")
+                msg.setIcon(QMessageBox.Critical)
+                msg.exec_()
+                return
+            else:
+                global x
+                x = 1
+                app.closeAllWindows()
+
+        else:
+            msg.setText('Incorrect Password/UserID')
+            msg.setWindowTitle("Invaild !")
+            msg.setIcon(QMessageBox.Warning)
+            msg.exec_()
+
+
+    def ForgotpasswordForm(self):                                             
+        self.w = ForgotpasswordForm()
+        self.w.show()        
+
+class ForgotpasswordForm(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowFlags(Qt.WindowCloseButtonHint | Qt.WindowMinimizeButtonHint)
-        self.setWindowTitle("Virtual Chem-labs")
-        self.DefPage()
-        self.stacked_layout = QStackedLayout()
-        self.stacked_layout.addWidget(self.DefPage_widget)
-        self.stacked_layout.setCurrentIndex(0)
-        self.Central_widget = QWidget()
-        self.Central_widget.setLayout(self.stacked_layout)
-        self.setCentralWidget(self.Central_widget)
-
-
-    def DefPage(self):
-        self.head = QLabel("VIRTUAL LABORATORY-1.0.0")
-        self.head.setAlignment(Qt.AlignCenter)
-        
-        self.but1 = QPushButton("Experiment 1")
-        self.but1.clicked.connect(self.exp1)
-        
-        self.but2 = QPushButton("Experiment 2")
-        self.but3 = QPushButton("Experiment 3")
-        self.but4 = QPushButton("Experiment 4")
-        self.defLab = QLabel("Calculation of strength of ")
-        self.defLab2 = QLabel("Ph acid - base titration")
-        self.defLab3 = QLabel("experiment 3")
-        self.defLab4 = QLabel("experiment 4") 
-
-        self.defLay = QFormLayout()
-
-        for i, j in zip([self.but1, self.but2, self.but3, self.but4],
-                        [self.defLab, self.defLab2, self.defLab3, self.defLab4]):
-            self.defLay.addRow(i, j)
-
-        
-        self.defGr1 = QGroupBox()
-        self.defGr1.setLayout(self.defLay)
-        self.defLab5 = QLabel("Last performed remarks :")
-        self.defLab5.setAlignment(Qt.AlignLeft)
-        self.TEXT_BOX_H = QPlainTextEdit()
-        #self.TEXT_BOX_H.setMaximumWidth(135)
-        self.TEXT_BOX_H.setReadOnly(True)
-        
-        self.defPageLay = QVBoxLayout()
-        self.defPageLay.addWidget(self.head)
-        self.defPageLay.addWidget(self.defGr1)
-        self.defPageLay.addWidget(self.defLab5)
-        self.defPageLay.addWidget(self.TEXT_BOX_H)
-
-        self.sideAni = QMovie("ani1.gif")
-        self.sideAni.frameChanged.connect(self.repaint)
-        self.sideAniLab = QLabel()
-        self.sideAniLab.setMovie(self.sideAni)
-        self.sideAni.start()
-
-        self.defGr2 = QGroupBox()
-        self.defGr2.setLayout(self.defPageLay)
-
-        self.DefBox = QHBoxLayout()
-        self.DefBox.addWidget(self.defGr2)
-        self.DefBox.addWidget(self.sideAniLab)
-
-        self.DefPage_widget = QWidget()
-        self.DefPage_widget.setLayout(self.DefBox)
-        #self.HomePage_widget.setGeometry(100,100,200,200)
-        self.DefPage_widget.setWindowTitle("Chem OnLine")
-        
-        
-    def exp1(self):
-       
-        try:
-            self.stacked_layout.setCurrentWidget(self.HomePage_widget)
-        except:
-            self.HomePage()
-            self.stacked_layout.addWidget(self.HomePage_widget)
-            self.stacked_layout.setCurrentWidget(self.HomePage_widget)
-
-
-
-    def HomePage(self):
-        
-        self.tabs = QTabWidget()
-        self.tab1 = QWidget()
-        self.tab2 = QWidget()
-        self.tab3 = QWidget()
-        self.tab4 = QWidget()
-        #self.tabs.resize(300,200)
-        
-        # Add tabs
-        self.tabs.addTab(self.tab1,"Theory")
-        self.tabs.addTab(self.tab2,"Perform")
-        self.tabs.addTab(self.tab3, "Video")
-        self.tabs.addTab(self.tab4, "Question Bank")
-        
-        # Create first tab
-        '''
-        self.tab1.layout = QVBoxLayout(self)
-        self.pushButton1 = QPushButton("PyQt5 button")
-        self.tab1.layout.addWidget(self.pushButton1)
-        self.tab1.setLayout(self.tab1.layout)
-        
-        # Add tabs to widget
-        self.layout.addWidget(self.tabs)
-        self.setLayout(self.layout)
-        '''
-        
-        self.label = QLabel("1.Standarizing Hypo Solution\n with known concentration of CuSO4")
-        self.label2 = QLabel("Process to prepare standard CuSO4.5H2O solution :")
-
-        self.weight = QLineEdit()
-        #self.weight.setFixedWidth(100)
-        self.init_bur = 50.00
-        self.n2 = QLineEdit()
-        self.n2.setReadOnly(True)
-        self.ans = QLineEdit()
-        self.ans.setReadOnly(True)
-
-        
-        self.label3 = QLabel("Enter weight(grm) of CuSO4.5H2O salt\n(Taken in 100 ml of H2O)")
-        self.WeightLine = QLineEdit()
-        self.WeightLine.setFixedWidth(100)
-        self.WeightLine.returnPressed.connect(self.getWeight)
-        
-        self.VolLabel = QLabel("Enter Volume(ml) of CuSO4.5H2O salt\n(Taken in conical flask)")
-        self.VolLine = QLineEdit()
-        self.VolLine.setFixedWidth(100)
-        self.VolLine.setReadOnly(True)
-        #self.vol = QLineEdit()
-        self.VolLine.returnPressed.connect(self.getvol)
-        self.tempLine = QLineEdit()
-        self.tempLine.setReadOnly(True)
-        self.tempLine.textChanged.connect(self.randomVol)
-        
-        self.label4 = QLabel()
-        self.lab45 = QLabel()
-        self.label5 = QLabel()
-        self.label6 = QLabel()
-        
-        
-        
-        self.label7 = QLabel("2. Finding the strength of unknown CuSO4 solution")
-        self.label8 = QLabel("Enter the Volume(ml) of unknown\n CuSO4.5H2O salt taken")
-        self.Unknown = QLineEdit()
-        self.Unknown.setFixedWidth(100)
-        self.Unknown.setReadOnly(True)
-        self.Unknown.returnPressed.connect(self.calculate)
-        self.lab9 = QLabel()
-        
-        self.label9 = QLabel()
-        self.label10 = QLabel()
-        
-        self.label11 = QLabel("Calculate the strength of unknown solution\n Put your answer below :")
-        self.ansLine = QLineEdit()
-        self.ansLine.setFixedWidth(100)
-        self.ansLine.setReadOnly(True)
-        self.ansLine.returnPressed.connect(self.checkAns)
-        self.correctLabel = QLabel()
-
-        self.HomeLay = QVBoxLayout()
-        
-
-        for i in[self.label, self.label2, self.label3, self.WeightLine, self.VolLabel, self.VolLine,
-                   self.label4, self.lab45, self.label5, self.label6, self.label7, self.label8,
-                   self.Unknown,self.lab9, self.label9, self.label10, self.label11, self.ansLine, self.correctLabel]:
-            self.HomeLay.addWidget(i)
-            
-        
-        self.Title = QLabel("DETERMINING THE STRENGTH OF UNKNOWN SOLUTION OF CuSO4")
-        self.Title.setAlignment(Qt.AlignCenter)
-        self.movie2 = QMovie("an2.gif")
-        self.movie2.frameChanged.connect(self.repaint)
-        self.movie = QLabel()
-        self.movie.setMovie(self.movie2)
-        self.movie2.start()
-
-        
-
-        self.movieBox = QVBoxLayout()
-        self.movieBox.addWidget(self.Title)
-        self.movieBox.addWidget(self.movie)
-        self.group1 = QGroupBox()
-        self.group1.setLayout(self.movieBox)
-        self.group2 = QGroupBox()
-        self.group2.setLayout(self.HomeLay)
-
-        self.pageBox = QHBoxLayout()
-        self.pageBox.addWidget(self.group2)
-        self.pageBox.addWidget(self.group1)
-        
-        self.tab2.setLayout(self.pageBox)
-        
-        #self.tab1text = QPlainTextEdit()
-        
-        self.l1 = QLabel()
-        self.l1.setPixmap(QPixmap("Copper-1.jpg"))
-        #self.l1.setAlignment(Qt.AlignCenter)
-        self.l1.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.l1.setAlignment(Qt.AlignCenter)
-        self.l1.setStyleSheet("QLabel {background-color: red;}")
-        
-        self.l2 = QLabel()
-        self.l2.setPixmap(QPixmap("Copper-2.jpg"))
-        self.l2.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.l2.setAlignment(Qt.AlignCenter)
-        self.l2.setStyleSheet("QLabel {background-color: red;}")
-        
-        self.tab3text = QPlainTextEdit()
-        self.tab4text = QPlainTextEdit()
-        
-        self.tab1Lay = QVBoxLayout()
-        self.tab1Lay.addWidget(self.l1)
-        self.tab1Lay.addWidget(self.l2)
-
-        self.scrollWidget = QWidget()
-        self.scrollWidget.setLayout(self.tab1Lay)
-
-        self.scrollAr = QScrollArea()
-        self.scrollAr.setWidget(self.scrollWidget)
-        
-        self.tab3Lay = QVBoxLayout()
-        self.tab3Lay.addWidget(self.tab3text)
-        
-        self.tab4Lay = QVBoxLayout()
-        self.tab4Lay.addWidget(self.tab4text)
-        
-        self.tab1Lay2 = QVBoxLayout()
-        self.tab1Lay2.addWidget(self.scrollAr)
-        
-        self.tab1.setLayout(self.tab1Lay2)
-        self.tab3.setLayout(self.tab3Lay)
-        self.tab4.setLayout(self.tab4Lay)
-
-        self.backHome = QPushButton("Back")
-        self.backHome.clicked.connect(self.goBackToDef)
-        
-        self.HomePage_lay = QFormLayout()
-        self.HomePage_lay.addRow(self.tabs, self.backHome)
-        
-       
-        
-        self.HomePage_widget = QWidget()
-        self.HomePage_widget.setLayout(self.HomePage_lay)
-        #self.HomePage_widget.setGeometry(100,100,200,200)
-        self.HomePage_widget.setWindowTitle("Experiment 1")
-
-    def goBackToDef(self):
-        self.stacked_layout.setCurrentWidget(self.DefPage_widget)
-    def getWeight(self):
-        try:
-            flo = float(self.WeightLine.text())
-            #print("ok")
-            self.label4.setText("Processing.....")
-            #print("ok2")
-            self.weight.setText(str(flo))
-            #print("ok3")
-            self.VolLine.setReadOnly(False)
-        except:
-            self.WeightLine.setText("")
-            self.errorMessage()
-        
-    def getvol(self):
-        try:
-            f = float(self.VolLine.text())
-            #self.vol = f
-            init_bur = 50.00
-            
-            self.lab45.setText("Following are the burrette readings")
-            print("ok1")
-            self.label5.setText("Initial Reading : "+str(init_bur)+ " ml")
-            print("ok2")
-            self.tempLine.setText(str(f))
-            print("ok3")
-            self.Unknown.setReadOnly(False)
-            
-        except:
-            self.VolLine.setText("")
-            self.errorMessage()
-            
-    def randomVol(self):
-        f = float(self.tempLine.text())
-        k = float(random.randint(10000, 40000))
-        final_bur = k/1000
-        we = float(self.weight.text())
-        self.label6.setText("Final Reading : "+str(final_bur)+ " ml")
-        n1 = we/249.68
-        v2 = 50.00-f
-        n2 = (n1*f)/v2
-        self.n2.setText(str(n2))
-            
-    def calculate(self):
-        try:
-            n2 = float(self.n2.text())
-            v3 = float(self.Unknown.text())
-            k = float(random.randint(9000, 45000))
-            v4 = k/1000
-            self.lab9.setText("Following are the burrette readings")
-            self.label9.setText("Initial Reading : "+str(self.init_bur)+ " ml")
-            self.label10.setText("Final Reading : "+str(v4)+" ml")
-            vlo4 = 50.00-v4
-            n3 = (n2*vlo4)/v3
-            self.ans.setText(str(n3))
-            self.ansLine.setReadOnly(False)
-        except:
-            self.Unknown.setTeext("")
-            self.errorMessage()
-    def checkAns(self):
-        try:
-            an = float(self.ans.text())
-            an = round(an, 3)
-            user = float(self.ansLine.text())
-            
-            if(user >= an*0.95 and user <= an*1.05):
-                self.correctLabel.setText("Correct Answer !")
-            else:
-                self.correctLabel.setText("Incorrect ! Ans = "+str(an))
-        except :
-            print("error in checkAns")
-
-    def errorMessage(self):
-        self.w = QMessageBox()
-        self.w.resize(150, 150)
-        self.w.setIcon(QMessageBox.Warning)
-        self.w.setInformativeText("Invalid entry !")
-        self.w.setWindowTitle("Warning")
-        self.w.exec()      
+        self.setWindowTitle('Forgot password?')
+        self.resize(400, 100)
     
-def main(app):
-    Vlab = app
-    VlabWind = VlabWindow()
-    VlabWind.show()
-    VlabWind.raise_()
-    Vlab.exec_()
+        layout = QGridLayout()
+        widget = QLabel("VLAB-Forget Password")
+        #widget.setAlignment(Qt.AlignCe)
+        #widget.setFont(QtGui.QFont('Times', 15))
+        widget2 = QLabel("Forget Password")
+        #widget2.setAlignment(Qt.AlignCenter)
+        label_name = QLabel('<font size="5"> Name </font>')
+        label_email = QLabel('<font size="5">User Id*</font>')
+        #label_user = QLabel('<font size="4">Username*</font>')
+
+        layout.addWidget(widget, 0, 0, 1, 3)
+        #layout.addWidget(widget2, 1, 1)
+        layout.addWidget(label_name, 2, 0, 1, 1)
+        layout.addWidget(label_email, 3, 0, 1, 1)
+        #layout.addWidget(label_user, 4, 0, 1, 1)
+
+        self.lineEdit_name = QLineEdit()
+        self.lineEdit_name.setFont(QtGui.QFont('Times', 12))
+        self.lineEdit_name.setPlaceholderText('Please enter your name')
+
+        layout.addWidget(self.lineEdit_name, 2, 1, 1, 3)
+        
+        self.lineEdit_email=QLineEdit()
+        self.lineEdit_email.setFont(QtGui.QFont('Times', 12))
+        self.lineEdit_email.setPlaceholderText('Please enter your userid')
+        layout.addWidget(self.lineEdit_email, 3, 1, 1, 3)
+
+        self.lineEdit_user=QLineEdit()
+        self.lineEdit_user.setPlaceholderText('Please enter your username')
+        self.lineEdit_user.returnPressed.connect(self.forget_password)
+        #layout.addWidget(self.lineEdit_user, 4, 1, 1, 3)
+        
+        forgot_login = QPushButton('Send password')
+        forgot_login.setFont(QtGui.QFont('Times', 12))
+        forgot_login.clicked.connect(self.forget_password)
+        layout.addWidget(forgot_login, 4, 1, 1, 2)
+        self.setLayout(layout)
 
 
+    def forget_password(self):
+        
+        if(self.lineEdit_email.text() == ''):
+            msg = QMessageBox()
+            msg.setWindowTitle("Missing details")
+            msg.setText("Fields marked with * are required")
+            msg.setIcon(QMessageBox.Warning)
+            msg.exec_()
+            return
+        
+        else:
+            user_details = sheets.fetchDetails(self.lineEdit_email.text())
+            if(user_details == None):
+                #print("No details")
+                msg = QMessageBox()
+                msg.setWindowTitle("User Not found")
+                msg.setText("User Not Found")
+                msg.setInformativeText("Provide valid Email address.")
+                msg.setIcon(QMessageBox.Critical)
+                msg.exec_()
+                return
+
+            else:
+                sender='vlab.noreply@gmail.com'
+                password='sbokdrslmdfecbxs'
+                smtpserver=smtplib.SMTP("smtp.gmail.com",587)
+                smtpserver.ehlo()
+                smtpserver.starttls()
+                smtpserver.ehlo
+                smtpserver.login(sender,password)
+                msg='Subject:Password for VLab\n'+'Hi '+self.lineEdit_name.text()+'\n\nCredentials for Vlab:\nUsername: '+user_details[0]+'\nPassword: '+user_details[1]+'\n\n Regards\nDepartment of chemistry'
+                sent = smtpserver.sendmail(sender,user_details[0],msg)
+                if(sent == {}):
+                    msg=QMessageBox()
+                    msg.setWindowTitle("Success")
+                    msg.setText('Mail Sent')
+                    msg.setInformativeText('Please check your inbox. Also check your spam folder')
+                    msg.setIcon(QMessageBox.Information)
+                    msg.exec_()
+                    self.hide()
+                else:
+                    msg=QMessageBox()
+                    msg.setWindowTitle("Failed")
+                    msg.setText('Unable to send message')
+                    msg.setIcon(QMessageBox.Critical)
+                    msg.exec_()
+                    #self.hide()
+                smtpserver.close()
+                return
+
+import srcMain
+if __name__ == "__main__":
+    app = QtWidgets.QApplication(sys.argv)
+    app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
+    MainWindow = QtWidgets.QMainWindow()
+    ui = Ui_MainWindow()
+    ui.setupUi(MainWindow)
+    MainWindow.show()
+    app.exec_()
+    if(x == 1):
+        import testVlab
+        testVlab.main(app, user_dets, k, sheets)
