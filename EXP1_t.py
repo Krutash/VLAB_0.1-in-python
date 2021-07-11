@@ -5,6 +5,8 @@ import random
 
 from PyQt5.QtMultimedia import QMediaContent, QMediaPlayer
 from PyQt5.QtMultimediaWidgets import QVideoWidget
+import os
+FOLDER = os.getcwd()
 
 dataGEN = [0, 0, 0, 0, 0, 0, 0, 0, 0]
 
@@ -531,7 +533,7 @@ class Exp1_class(QTabWidget):
 
     def play(self):
         
-        fileName = "media/exp1.mp4"
+        fileName = FOLDER+"/media/exp1.mp4"
         if self.loaded1 == 0:
             self.mediaPlayer.setMedia(QMediaContent(QUrl.fromLocalFile(fileName)))
             self.playButton.setEnabled(True)
